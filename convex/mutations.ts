@@ -1,54 +1,9 @@
 import { mutation } from "./_generated/server";
 import { v } from "convex/values";
+import { getAuthenticatedUserId, requireAdmin, requireOwnerOrAdmin } from "./auth";
+import { validateRecommendationInput } from "./validation";
+import { GENRES } from "../types";
 
-/**
- * Helper function to validate URL format
- */
-function isValidUrl(urlString: string): boolean {
-  try {
-    const url = new URL(urlString);
-    return url.protocol === "http:" || url.protocol === "https:";
-  } catch {
-    return false;
-  }
-}
-
-/**
- * Helper function to validate input fields
- */
-function validateRecommendationInput(input: {
-  title: string;
-  genre: string;
-  link: string;
-  blurb: string;
-}): { isValid: boolean; error?: string } {
-  if (!input.title || input.title.trim().length === 0) {
-    return { isValid: false, error: "Title is required" };
-  }
-  if (input.title.length > 200) {
-    return { isValid: false, error: "Title must be 200 characters or less" };
-  }
-
-  if (!input.genre || input.genre.trim().length === 0) {
-    return { isValid: false, error: "Genre is required" };
-  }
-
-  if (!input.link || input.link.trim().length === 0) {
-    return { isValid: false, error: "Link is required" };
-  }
-  if (!isValidUrl(input.link)) {
-    return { isValid: false, error: "Link must be a valid URL" };
-  }
-
-  if (!input.blurb || input.blurb.trim().length === 0) {
-    return { isValid: false, error: "Blurb is required" };
-  }
-  if (input.blurb.length > 500) {
-    return { isValid: false, error: "Blurb must be 500 characters or less" };
-  }
-
-  return { isValid: true };
-}
 
 /**
  * Create a new recommendation
@@ -63,32 +18,30 @@ export const createRecommendation = mutation({
     authorName: v.string(),
   },
   handler: async (ctx, args) => {
-    // Get the authenticated user's identity
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
-      throw new Error("Unauthorized: You must be signed in to create a recommendation");
+    // Get the authenticated user's ID (throws if not authenticated)
+    const authorId = await getAuthenticatedUserId(ctx);
+
+    // Validate and sanitize input
+    const validation = validateRecommendationInput(
+      {
+        title: args.title,
+        genre: args.genre,
+        link: args.link,
+        blurb: args.blurb,
+      },
+      GENRES
+    );
+
+    if (!validation.isValid || !validation.sanitized) {
+      throw new Error(validation.error || "Invalid input");
     }
 
-    const authorId = identity.subject; // Clerk user ID
-
-    // Validate input
-    const validation = validateRecommendationInput({
-      title: args.title,
-      genre: args.genre,
-      link: args.link,
-      blurb: args.blurb,
-    });
-
-    if (!validation.isValid) {
-      throw new Error(validation.error);
-    }
-
-    // Create the recommendation
+    // Create the recommendation with sanitized input
     const recommendationId = await ctx.db.insert("recommendations", {
-      title: args.title.trim(),
-      genre: args.genre.trim(),
-      link: args.link.trim(),
-      blurb: args.blurb.trim(),
+      title: validation.sanitized.title,
+      genre: validation.sanitized.genre,
+      link: validation.sanitized.link,
+      blurb: validation.sanitized.blurb,
       authorId,
       authorName: args.authorName.trim(),
       isStaffPick: false,
@@ -107,39 +60,14 @@ export const deleteRecommendation = mutation({
     id: v.id("recommendations"),
   },
   handler: async (ctx, args) => {
-    // Get the authenticated user's identity
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
-      throw new Error("Unauthorized: You must be signed in to delete a recommendation");
-    }
-
-    const userId = identity.subject; // Clerk user ID
-
     // Get the recommendation
     const recommendation = await ctx.db.get(args.id);
     if (!recommendation) {
       throw new Error("Recommendation not found");
     }
 
-    // Check if user is the owner
-    const isOwner = recommendation.authorId === userId;
-
-    // Check if user is admin (from Clerk metadata)
-    // Note: In a real implementation, you might want to check Clerk metadata
-    // or store roles in Convex. For now, we'll check if user exists in users table
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_clerk_user_id", (q) => q.eq("clerkUserId", userId))
-      .first();
-
-    const isAdmin = user?.role === "admin";
-
-    // Only allow deletion if user is owner or admin
-    if (!isOwner && !isAdmin) {
-      throw new Error(
-        "Unauthorized: You can only delete your own recommendations unless you are an admin"
-      );
-    }
+    // Require user to be owner or admin (throws if not authorized)
+    await requireOwnerOrAdmin(ctx, recommendation.authorId);
 
     // Delete the recommendation
     await ctx.db.delete(args.id);
@@ -157,25 +85,8 @@ export const toggleStaffPick = mutation({
     id: v.id("recommendations"),
   },
   handler: async (ctx, args) => {
-    // Get the authenticated user's identity
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
-      throw new Error("Unauthorized: You must be signed in");
-    }
-
-    const userId = identity.subject; // Clerk user ID
-
-    // Check if user is admin
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_clerk_user_id", (q) => q.eq("clerkUserId", userId))
-      .first();
-
-    const isAdmin = user?.role === "admin";
-
-    if (!isAdmin) {
-      throw new Error("Unauthorized: Only admins can mark recommendations as staff picks");
-    }
+    // Require admin role (throws if not admin)
+    await requireAdmin(ctx);
 
     // Get the recommendation
     const recommendation = await ctx.db.get(args.id);
