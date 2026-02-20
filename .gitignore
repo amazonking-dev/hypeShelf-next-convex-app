@@ -40,3 +40,6 @@ next-env.d.ts
 
 # technical roadmap
 TECHNICAL_ROADMAP.md
+ENV_SETUP.md
+# clerk configuration (can include secrets)
+/.clerk/
