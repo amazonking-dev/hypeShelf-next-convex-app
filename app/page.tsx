@@ -1,4 +1,5 @@
 import { SignInButton } from "@clerk/nextjs";
+import { LatestRecommendations } from "@/components/recommendations/LatestRecommendations";
 
 export default function Home() {
   return (
@@ -35,6 +36,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Latest Recommendations Section */}
+      <LatestRecommendations limit={8} />
 
       {/* Features Section */}
       <section className="container mx-auto px-4 py-16">
