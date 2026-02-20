@@ -1,4 +1,4 @@
-import { SignInButton } from "@clerk/nextjs";
+import { SignInButtonWrapper } from "@/components/ui/SignInButtonWrapper";
 import { LatestRecommendations } from "@/components/recommendations/LatestRecommendations";
 
 export default function Home() {
@@ -19,11 +19,11 @@ export default function Home() {
 
           {/* CTA Button */}
           <div className="mt-10">
-            <SignInButton mode="modal">
+            <SignInButtonWrapper redirectUrl="/recommendations">
               <button className="inline-flex items-center px-8 py-3 text-lg font-semibold text-white bg-gray-900 rounded-lg hover:bg-gray-800 transition-colors duration-200 shadow-lg hover:shadow-xl">
                 Sign in to add yours
               </button>
-            </SignInButton>
+            </SignInButtonWrapper>
           </div>
 
           {/* Description */}

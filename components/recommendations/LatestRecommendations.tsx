@@ -4,18 +4,30 @@ import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { RecommendationCard } from "./RecommendationCard";
 import { Recommendation } from "@/types";
+import { useEffect, useState } from "react";
 
 interface LatestRecommendationsProps {
   limit?: number;
 }
 
 export function LatestRecommendations({ limit = 8 }: LatestRecommendationsProps) {
-  // Note: Convex API types will be generated when npx convex dev is run
-  // Using type assertion until types are available
+  const [error, setError] = useState<string | null>(null);
+
   const recommendations = useQuery(
-    (api as any).recommendations?.getLatestRecommendations,
+    api.recommendations.getLatestRecommendations,
     limit ? { limit } : {}
-  ) as Recommendation[] | undefined;
+  );
+
+  useEffect(() => {
+    if (recommendations === undefined && !error) {
+      // Check if Convex URL is configured
+      if (!process.env.NEXT_PUBLIC_CONVEX_URL) {
+        setError(
+          "Convex is not configured. Please set NEXT_PUBLIC_CONVEX_URL in your .env.local file."
+        );
+      }
+    }
+  }, [recommendations, error]);
 
   if (recommendations === undefined) {
     return (
