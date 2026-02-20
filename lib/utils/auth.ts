@@ -13,7 +13,7 @@ export async function getUserRole(): Promise<UserRole | null> {
 
     // Get role from Clerk's public metadata
     const role = user.publicMetadata?.role as UserRole | undefined;
-    
+
     // Default to "user" if no role is set
     return role === "admin" ? "admin" : "user";
   } catch (error) {
