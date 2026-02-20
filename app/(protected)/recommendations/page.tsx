@@ -1,4 +1,5 @@
 import { AddRecommendationForm } from "@/components/recommendations/AddRecommendationForm";
+import { RecommendationsList } from "@/components/recommendations/RecommendationsList";
 
 export default function RecommendationsPage() {
   return (
@@ -14,7 +15,8 @@ export default function RecommendationsPage() {
         <AddRecommendationForm />
       </div>
 
-      {/* Recommendation list will be added in Phase 4.3 */}
+      {/* Recommendations List */}
+      <RecommendationsList />
     </div>
   );
 }
