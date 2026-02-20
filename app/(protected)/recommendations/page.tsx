@@ -1,3 +1,5 @@
+import { AddRecommendationForm } from "@/components/recommendations/AddRecommendationForm";
+
 export default function RecommendationsPage() {
   return (
     <div>
@@ -6,7 +8,13 @@ export default function RecommendationsPage() {
         View and manage your recommendations. Add new ones, filter by genre, or
         explore what others have shared.
       </p>
-      {/* Recommendation list and form will be added in Phase 4.2 and 4.3 */}
+
+      {/* Add Recommendation Form */}
+      <div className="max-w-xl mb-12">
+        <AddRecommendationForm />
+      </div>
+
+      {/* Recommendation list will be added in Phase 4.3 */}
     </div>
   );
 }
