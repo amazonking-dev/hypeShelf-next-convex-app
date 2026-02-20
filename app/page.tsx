@@ -1,9 +1,12 @@
 import { SignInButtonWrapper } from "@/components/ui/SignInButtonWrapper";
 import { LatestRecommendations } from "@/components/recommendations/LatestRecommendations";
+import { PublicNav } from "@/components/ui/PublicNav";
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+      <PublicNav />
+      <main>
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-16 md:py-24">
         <div className="max-w-4xl mx-auto text-center">
@@ -66,6 +69,7 @@ export default function Home() {
           </div>
         </div>
       </section>
-    </main>
+      </main>
+    </div>
   );
 }
