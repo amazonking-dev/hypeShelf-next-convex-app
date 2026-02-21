@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { RecommendationCard } from "./RecommendationCard";
+import { AuthenticatedRecommendationCard } from "./AuthenticatedRecommendationCard";
 import { GenreFilter } from "./GenreFilter";
 import { Recommendation } from "@/types";
 
@@ -94,7 +94,7 @@ export function RecommendationsList() {
       ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {displayRecommendations.map((recommendation: Recommendation) => (
-            <RecommendationCard
+            <AuthenticatedRecommendationCard
               key={recommendation._id}
               recommendation={recommendation}
             />
