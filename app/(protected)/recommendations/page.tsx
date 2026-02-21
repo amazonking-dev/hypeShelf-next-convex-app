@@ -1,14 +1,18 @@
 import { AddRecommendationForm } from "@/components/recommendations/AddRecommendationForm";
 import { RecommendationsList } from "@/components/recommendations/RecommendationsList";
+import { AdminBanner } from "@/components/ui/AdminBanner";
 
 export default function RecommendationsPage() {
   return (
     <div>
       <h1 className="text-3xl font-bold text-gray-900 mb-2">My Shelf</h1>
-      <p className="text-gray-600 mb-8">
+      <p className="text-gray-600 mb-6">
         View and manage your recommendations. Add new ones, filter by genre, or
         explore what others have shared.
       </p>
+
+      {/* Admin Banner - visible only to admins */}
+      <AdminBanner />
 
       {/* Add Recommendation Form */}
       <div className="max-w-xl mb-12">
