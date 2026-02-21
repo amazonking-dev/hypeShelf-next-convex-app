@@ -7,7 +7,13 @@ interface RecommendationCardProps {
 
 export function RecommendationCard({ recommendation }: RecommendationCardProps) {
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-200 border border-gray-200">
+    <div
+      className={`bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-200 border ${
+        recommendation.isStaffPick
+          ? "border-yellow-400 ring-2 ring-yellow-100"
+          : "border-gray-200"
+      }`}
+    >
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1">

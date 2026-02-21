@@ -18,9 +18,11 @@ export function AuthenticatedRecommendationCard({
 }: AuthenticatedRecommendationCardProps) {
   const { user } = useUser();
   const deleteRecommendation = useMutation(api.mutations.deleteRecommendation);
+  const toggleStaffPick = useMutation(api.mutations.toggleStaffPick);
 
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isTogglingStaffPick, setIsTogglingStaffPick] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const currentUserId = user?.id ?? null;
@@ -56,12 +58,62 @@ export function AuthenticatedRecommendationCard({
     }
   };
 
+  const handleToggleStaffPick = async () => {
+    setIsTogglingStaffPick(true);
+    setError(null);
+
+    try {
+      await toggleStaffPick({ id: recommendation._id as Id<"recommendations"> });
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to update staff pick status"
+      );
+    } finally {
+      setIsTogglingStaffPick(false);
+    }
+  };
+
   return (
     <>
       <div className="relative">
         <RecommendationCard recommendation={recommendation} />
-        {canDelete && (
-          <div className="absolute top-4 right-4">
+        <div className="absolute top-4 right-4 flex items-center gap-1">
+          {isAdmin && (
+            <button
+              type="button"
+              onClick={handleToggleStaffPick}
+              disabled={isTogglingStaffPick}
+              className={`p-2 rounded-lg transition-colors disabled:opacity-50 ${
+                recommendation.isStaffPick
+                  ? "text-yellow-500 hover:bg-yellow-50"
+                  : "text-gray-400 hover:text-yellow-500 hover:bg-yellow-50"
+              }`}
+              title={
+                recommendation.isStaffPick
+                  ? "Remove Staff Pick"
+                  : "Mark as Staff Pick"
+              }
+              aria-label={
+                recommendation.isStaffPick
+                  ? "Remove Staff Pick"
+                  : "Mark as Staff Pick"
+              }
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                viewBox="0 0 20 20"
+                fill={recommendation.isStaffPick ? "currentColor" : "none"}
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+              </svg>
+            </button>
+          )}
+          {canDelete && (
             <button
               type="button"
               onClick={handleDeleteClick}
@@ -83,8 +135,8 @@ export function AuthenticatedRecommendationCard({
                 />
               </svg>
             </button>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       <DeleteConfirmDialog
