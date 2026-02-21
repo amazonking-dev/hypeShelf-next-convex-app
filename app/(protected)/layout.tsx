@@ -16,7 +16,7 @@ export default async function ProtectedLayout({
   return (
     <div className="min-h-screen bg-gray-50">
       <UserNav />
-      <main className="container mx-auto px-4 py-8">{children}</main>
+      <main className="container mx-auto px-4 py-8" role="main">{children}</main>
     </div>
   );
 }

@@ -3,6 +3,7 @@
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { RecommendationCard } from "./RecommendationCard";
+import { SkeletonCard } from "@/components/ui/Skeleton";
 import { Recommendation } from "@/types";
 import { useEffect, useState } from "react";
 
@@ -31,9 +32,18 @@ export function LatestRecommendations({ limit = 8 }: LatestRecommendationsProps)
 
   if (recommendations === undefined) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="text-center text-gray-500">Loading recommendations...</div>
-      </div>
+      <section className="container mx-auto px-4 py-16">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
+            Latest Recommendations
+          </h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <SkeletonCard />
+            <SkeletonCard />
+            <SkeletonCard />
+          </div>
+        </div>
+      </section>
     );
   }
 

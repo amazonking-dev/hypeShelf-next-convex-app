@@ -5,6 +5,7 @@ import { useMutation } from "convex/react";
 import { useUser } from "@clerk/nextjs";
 import { api } from "@/convex/_generated/api";
 import { GENRES } from "@/types";
+import { useToast } from "@/components/ui/Toast";
 
 const BLURB_MAX_LENGTH = 500;
 const TITLE_MAX_LENGTH = 200;
@@ -21,6 +22,7 @@ function isValidUrl(url: string): boolean {
 export function AddRecommendationForm() {
   const createRecommendation = useMutation(api.mutations.createRecommendation);
   const { user } = useUser();
+  const { toast } = useToast();
 
   const [title, setTitle] = useState("");
   const [genre, setGenre] = useState("");
@@ -89,13 +91,15 @@ export function AddRecommendationForm() {
 
       setSuccess(true);
       resetForm();
+      toast("Recommendation added successfully!", "success");
 
       // Clear success message after 3 seconds
       setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to add recommendation"
-      );
+      const msg =
+        err instanceof Error ? err.message : "Failed to add recommendation";
+      setError(msg);
+      toast(msg, "error");
     } finally {
       setIsSubmitting(false);
     }

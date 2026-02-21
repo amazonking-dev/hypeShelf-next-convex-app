@@ -8,6 +8,7 @@ import { Id } from "@/convex/_generated/dataModel";
 import { Recommendation } from "@/types";
 import { RecommendationCard } from "./RecommendationCard";
 import { DeleteConfirmDialog } from "@/components/ui/DeleteConfirmDialog";
+import { useToast } from "@/components/ui/Toast";
 
 interface AuthenticatedRecommendationCardProps {
   recommendation: Recommendation;
@@ -17,6 +18,7 @@ export function AuthenticatedRecommendationCard({
   recommendation,
 }: AuthenticatedRecommendationCardProps) {
   const { user } = useUser();
+  const { toast } = useToast();
   const deleteRecommendation = useMutation(api.mutations.deleteRecommendation);
   const toggleStaffPick = useMutation(api.mutations.toggleStaffPick);
 
@@ -42,10 +44,12 @@ export function AuthenticatedRecommendationCard({
     try {
       await deleteRecommendation({ id: recommendation._id as Id<"recommendations"> });
       setShowDeleteDialog(false);
+      toast("Recommendation deleted", "success");
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to delete recommendation"
-      );
+      const msg =
+        err instanceof Error ? err.message : "Failed to delete recommendation";
+      setError(msg);
+      toast(msg, "error");
     } finally {
       setIsDeleting(false);
     }
@@ -64,12 +68,17 @@ export function AuthenticatedRecommendationCard({
 
     try {
       await toggleStaffPick({ id: recommendation._id as Id<"recommendations"> });
+      toast(
+        recommendation.isStaffPick ? "Staff pick removed" : "Marked as staff pick",
+        "success"
+      );
     } catch (err) {
-      setError(
+      const msg =
         err instanceof Error
           ? err.message
-          : "Failed to update staff pick status"
-      );
+          : "Failed to update staff pick status";
+      setError(msg);
+      toast(msg, "error");
     } finally {
       setIsTogglingStaffPick(false);
     }

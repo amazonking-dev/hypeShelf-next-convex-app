@@ -5,6 +5,7 @@ import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { AuthenticatedRecommendationCard } from "./AuthenticatedRecommendationCard";
 import { GenreFilter } from "./GenreFilter";
+import { SkeletonCard } from "@/components/ui/Skeleton";
 import { Recommendation } from "@/types";
 
 export function RecommendationsList() {
@@ -23,12 +24,10 @@ export function RecommendationsList() {
   if (allRecommendations === undefined) {
     return (
       <div className="py-12">
-        <div className="flex items-center justify-center">
-          <div className="animate-pulse flex flex-col gap-4 w-full max-w-4xl">
-            <div className="h-48 bg-gray-200 rounded-lg" />
-            <div className="h-48 bg-gray-200 rounded-lg" />
-            <div className="h-48 bg-gray-200 rounded-lg" />
-          </div>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <SkeletonCard />
+          <SkeletonCard />
+          <SkeletonCard />
         </div>
       </div>
     );
@@ -71,13 +70,9 @@ export function RecommendationsList() {
       </div>
 
       {isLoadingFilter ? (
-        <div className="py-12">
-          <div className="flex items-center justify-center">
-            <div className="animate-pulse flex flex-col gap-4 w-full max-w-4xl">
-              <div className="h-48 bg-gray-200 rounded-lg" />
-              <div className="h-48 bg-gray-200 rounded-lg" />
-            </div>
-          </div>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <SkeletonCard />
+          <SkeletonCard />
         </div>
       ) : displayRecommendations.length === 0 ? (
         <div className="py-12 text-center">

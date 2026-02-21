@@ -1,3 +1,25 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  html {
+    @apply scroll-smooth;
+  }
+
+  /* Improve touch responsiveness on mobile */
+  button,
+  a {
+    @apply touch-manipulation;
+  }
+
+  /* Focus visible for keyboard navigation */
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-gray-900 ring-2 ring-gray-900;
+  }
+
+  /* Skip link for accessibility */
+  .skip-link {
+    @apply absolute -top-12 left-4 z-[100] bg-primary-900 text-white px-4 py-2 rounded-lg focus:top-4 transition-all;
+  }
+}
